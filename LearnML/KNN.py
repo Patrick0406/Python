@@ -157,12 +157,41 @@ def img2vector(filename):
             returnVect[0, 32 * i + j] = int(lineStr[j])
     return returnVect
 
+def handwritingClassTest():
+    #1.导入数据
+    hwLabels = []
+    trainingFileList = listdir('C:/Users/I332487/Desktop/trainingDigits')  #load the training set
+    m = len(trainingFileList)
+    trainingMat = zeros((m,1024))
+    #hwLabels存储0~9对应的index位置 trainingMat存放的每个位置对应的图片向量
+    for i in range(m):
+        fileNameStr = trainingFileList[i]
+        fileStr = fileNameStr.split('.')[0] #take off .txt
+        classNumStr = int(fileStr.split('_')[0])
+        hwLabels.append(classNumStr)
+        #将32*32的矩阵---> 1*1024的矩阵
+        trainingMat[i, :] = img2vector('C:/Users/I332487/Desktop/trainingDigits/%s' % fileNameStr)
 
+    #2. 导入测试数据
+    testFileList = listdir('C:/Users/I332487/Desktop/testDigits')  #iterate through the test set
+    errorCount = 0.0
+    mTest = len(testFileList)
+    for i in range(mTest):
+        fileNameStr = testFileList[i]
+        fileStr = fileNameStr.split('.')[0] #take off .txt
+        classNumStr = int(fileStr.split('_')[0])
+        vectorUnderTest = img2vector('C:/Users/I332487/Desktop/testDigits/%s' % fileNameStr)
+        classfierResult = classify0(vectorUnderTest, trainingMat, hwLabels, 3)
+        print "the classifier came back with: %d, the real answer is: %d" % (classfierResult, classNumStr)
+        if(classfierResult != classNumStr): errorCount += 1.0
+    print "\nthe total number of errors is: %d" % errorCount
+    print "\nthe total error rate is: %f" % (errorCount / float(mTest))
 
 
 if __name__ == '__main__':
     test1()
     datingClassTest()
+    handwritingClassTest()
 
 
 
